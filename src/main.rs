@@ -88,7 +88,6 @@ async fn load_configs() -> Result<(SubmitConfig, Option<SubmitUser>)> {
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 struct SubmitConfig {
-    #[allow(dead_code)]
     course_name: String,
     semester: String,
     project_number: String,
@@ -144,7 +143,8 @@ async fn generate_user(config: &SubmitConfig) -> Result<SubmitUser> {
 
     let user = SubmitUser {
         class_account: ca.to_string(),
-        one_time_password: otp.to_string()
+        // for some reason the server pops the last character
+        one_time_password: otp[0..otp.len()-1].to_string()
     };
 
     async fn try_save(su: &SubmitUser) -> Result<()> {
@@ -166,14 +166,15 @@ async fn generate_user(config: &SubmitConfig) -> Result<SubmitUser> {
 async fn submit(conf: SubmitConfig, user: SubmitUser, pack: Vec<u8>) -> Result<()> {
     let ms = SystemTime::now()
         .duration_since(SystemTime::UNIX_EPOCH)
-        .expect("Time went backwards???")
+        .expect("Time went backwards, try setting your system time to after 1969.")
         .as_millis();
 
     println!("[5/5] Submitting to server");
     let form = Form::new()
-        .text("submitclientVersion", "0.3.1")
+        .text("submitClientVersion", "0.3.1")
         // use proper timestamp in the future
         .text("cvstagTimestamp", format!("t{ms}"))
+        .text("courseName", conf.course_name)
         .text("classAccount", user.class_account)
         .text("projectNumber", conf.project_number)
         .text("authentication.type", "cas")
@@ -199,8 +200,11 @@ async fn submit(conf: SubmitConfig, user: SubmitUser, pack: Vec<u8>) -> Result<(
     if res.status().is_success() {
         println!("{}", "Succesfully submitted project!".bright_green());
     } else {
-        eprintln!("{} {}", "[!] Failed with http error: ".red(), res.status());
+        eprintln!("{} {}", "[!] Failed with http error: ".red(), res.status()); 
     }
+
+    let txt = res.text().await?;
+    eprintln!("[Server response] {txt}");
     Ok(())
 }
 
