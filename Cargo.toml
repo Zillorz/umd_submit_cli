@@ -1,0 +1,18 @@
+[package]
+name = "submit_umd"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+tokio = { version = "1.47.1", features = ["full"] }
+reqwest = { version = "0.12.23", features = ["multipart", "stream"] }
+async_zip = { version = "0.0.18", features = ["full"] }
+regex = "1.11.2"
+anyhow = "1.0.100"
+serde = { version = "1.0.226", features = ["derive"] }
+serde-java-properties = "0.2.0"
+yaup = "0.3.1"
+open = "5.3.2"
+walkdir = "2.5.0"
+colored = "3.0.0"
+indicatif = "0.18.0"
