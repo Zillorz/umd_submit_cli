@@ -10,3 +10,6 @@ Please feel free to open an issue or pr if your project
 - Uses an authentication other than 'cas'
 - Utilizes the `.submitIgnore` or `.submitInclude` files
 - Or if you have any enhancements to the cli!
+
+https://github.com/user-attachments/assets/a927acd6-bb65-45e3-a8a2-f52cc82ac6dd
+
